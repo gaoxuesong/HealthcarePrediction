@@ -1,20 +1,24 @@
-{% extends "app/layout.html" %}
+﻿{% extends "app/layout.html" %}
 
 {% block content %}
 
 <div class="jumbotron">
-    <h1>Hospital triage prediction</h1>
+    <h1>Hospital department prediction</h1>
     <!--<p class="lead">Django is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
     <p><a href="https://www.djangoproject.com/" class="btn btn-primary btn-large">Learn more &raquo;</a></p>-->
 </div>
 
 <div class="row">
     <div class="col-md-4">
-        <h2>Prediction Web Service</h2>
         <p>
             Prediction results based on the user ID.
         </p>
-        <p><a class="btn btn-default" href="getpredictiondata">Get Json Data &raquo;</a></p>
+        <form class="form-search" action="" method="get">
+          <input id="userid" class="form-control" name="userid" type="text" placeholder="input your userid" style="float:left"/><button class="btn btn-primary">search</button>
+        </form>
+
+        <div id="suggestion"></div>
+        <p><a id="getpredictiondata" class="btn btn-default" href="getpredictiondata">Get Json Data &raquo;</a></p>
     </div>
     <!--
         <div class="col-md-4">
@@ -30,4 +34,22 @@
     -->
 </div>
 
+{% endblock %}
+{% block scripts %}
+<script>
+var userid = document.getElementById('userid').value
+var getpredictiondata = document.getElementById('getpredictiondata')
+getpredictiondata.href = "getpredictiondata?userid="+'{{userid}}'
+$(document).ready(function(){
+             $.ajaxSettings.async = false;
+             $.getJSON('getpredictiondata?userid='+'{{userid}}', function(data) {
+                 var $parent = $("#suggestion");
+                 var $name = $("<p style='font-size:25px;font-weight:bold'><span class='label label-info'>user name</span>&nbsp;&nbsp;"+data.name+"</p>")    
+                 var $userid = $("<p style='font-size:25px;font-weight:bold'><span class='label label-info'>user id</span>&nbsp;&nbsp;"+data.userid+"</p>")
+                 var $department = $("<p style='font-size:25px;font-weight:bold'><span class='label label-info'>department</span>&nbsp;&nbsp;"+data.department+"</p>");
+                 $parent.append($department).append($userid).append($name);
+             })
+
+       });
+</script>
 {% endblock %}

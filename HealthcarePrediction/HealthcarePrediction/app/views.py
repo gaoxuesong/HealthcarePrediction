@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Definition of views.
 """
@@ -12,12 +13,14 @@ from django.http import HttpResponse
 def home(request):
     """Renders the home page."""
     assert isinstance(request, HttpRequest)
+    userId = request.GET.get('userid','')
     return render(
         request,
         'app/index.html',
         context_instance = RequestContext(request,
         {
             'title':'Home Page',
+            'userid':userId,
             'year':datetime.now().year,
         })
     )
@@ -38,8 +41,8 @@ def prediction(request):
 
 def getpredictiondata(request):
     """get prediction resualt data"""
-    userId = request.GET.get('userid','20')
-    ret = {'userid':userId, 'department':'orthopedics'}
+    userId = request.GET.get('userid','')
+    ret = {'userid':userId, 'department':['orthopedics','儿科']}
     return HttpResponse( json.dumps (ret))
 
 def contact(request):
