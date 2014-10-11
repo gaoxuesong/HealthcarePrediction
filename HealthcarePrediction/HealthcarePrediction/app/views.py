@@ -9,6 +9,15 @@ from django.template import RequestContext
 from datetime import datetime
 import json
 from django.http import HttpResponse
+import MySQLdb
+
+host_mysql='192.168.1.70'
+user_mysql='root'
+passwd_mysql='root123'
+port_mysql=3306
+db_mysql='gecris'
+con=MySQLdb.connect(host_mysql,user_mysql,passwd_mysql,db_mysql,port =port_mysql,charset='utf8',connect_timeout=30)
+cursor=con.cursor()
 
 def home(request):
     """Renders the home page."""
@@ -25,25 +34,39 @@ def home(request):
         })
     )
 
-def prediction(request):
-    """Renders the prediction page."""
-    assert isinstance(request, HttpRequest)
-    return render(
-        request,
-        'app/prediction.html',
-        context_instance = RequestContext(request,
-        {
-            'title':'Prediction',
-            'message':'suggested medical department is orthopedics.',
-            'year':datetime.now().year,
-        })
-    )
+def getdepartment(id):
+
+   r = []
+   order="SELECT PreExamDepartment,count(*) as num from ExamInfo WHERE PatientIntraID="+str(id)+" GROUP BY PreExamDepartment ORDER BY num desc"
+   cursor.execute(order)
+   result=cursor.fetchall()
+   for i in result:
+      r.append(( i[0],i[1]))
+   return r
+
+
+def getusername(id):
+   order="SELECT PatientNameChinese FROM PatientInfo WHERE PatientIntraID="+str(id)
+   cursor.execute(order)
+   result=cursor.fetchall()
+   if result:
+      return result[0][0]
+   else:
+      return ''
+
 
 def getpredictiondata(request):
     """get prediction resualt data"""
-    userId = request.GET.get('userid','')
-    ret = {'userid':userId, 'department':['orthopedics','儿科']}
-    return HttpResponse( json.dumps (ret))
+    userid = request.GET.get('userid','')
+    data = {}
+    try:
+        data['userid']=userid
+        data['username']=getusername(userid)
+        data['dep']=getdepartment(userid)
+    except:
+        return HttpResponse('not exist')
+    return HttpResponse( json.dumps(data, encoding='UTF-8', ensure_ascii=False) )
+
 
 def contact(request):
     """Renders the contact page."""
