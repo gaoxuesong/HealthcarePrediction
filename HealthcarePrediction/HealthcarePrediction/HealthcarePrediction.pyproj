@@ -6,6 +6,10 @@
     <RootNamespace>HealthcarePrediction</RootNamespace>
     <InterpreterId>{25400a8a-2f84-4339-9c5d-87ba6718f613}</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -52,6 +56,8 @@
     <Folder Include="HealthcarePrediction\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app\static\app\scripts\exporting.js" />
+    <Content Include="app\static\app\scripts\highcharts.js" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />
     <Content Include="app\static\app\content\bootstrap.css" />

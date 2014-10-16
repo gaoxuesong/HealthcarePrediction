@@ -41,7 +41,8 @@ def getdepartment(id):
    cursor.execute(order)
    result=cursor.fetchall()
    for i in result:
-      r.append(( i[0],i[1]))
+      a = '未知科室' if i[0]=='' or i[0]=='/' else i[0]
+      r.append(( a,i[1]))
    return r
 
 

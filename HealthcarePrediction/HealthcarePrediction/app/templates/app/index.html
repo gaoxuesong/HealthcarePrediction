@@ -1,23 +1,37 @@
 ﻿{% extends "app/layout.html" %}
 
+{% block css %}
+<style>
+.center {
+  width: auto;
+  margin:0 auto;
+  text-align:center;
+}
+.text-center {
+  text-align: center;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 
 <div class="jumbotron">
-    <h1>Hospital department prediction</h1>
+    <h1>Hospital triage prediction</h1>
     <!--<p class="lead">Django is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
     <p><a href="https://www.djangoproject.com/" class="btn btn-primary btn-large">Learn more &raquo;</a></p>-->
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <!--<h2>Prediction Web Service</h2>-->
+<div class="row center">
+    <div class="center" >
+        <h2>Prediction Web Service</h2>
         <p>
             Prediction results based on the user ID.
         </p>
-        <form class="form-search" action="" method="get" onsubmit="return checkForm()">
+        <form class="form-search center" action="" method="get" onsubmit="return checkForm()" style="width:350px;">
           <input id="userid" class="form-control" name="userid" type="text" placeholder="input your userid (a number)" style="float:left"/><button class="btn btn-primary">search</button>
-        </form>
-        <div id="suggestion"></div>
+        </form><br>
+		
+        <div id="suggestion" class="center" style="width:800px;"></div>
         <p><a id="getpredictiondata" class="btn btn-default" href="getpredictiondata">Get Json Data &raquo;</a></p>
     </div>
     <!--
@@ -51,25 +65,60 @@
     }
 
 
-    var userid = document.getElementById('userid').value
+var userid = document.getElementById('userid').value
 var getpredictiondata = document.getElementById('getpredictiondata')
 getpredictiondata.href = "getpredictiondata?userid="+'{{userid}}'
-$(document).ready(function(){
-             $.ajaxSettings.async = false;
-             $.getJSON('getpredictiondata?userid='+'{{userid}}', function(data) {
-                 var $parent = $("#suggestion");
-                 if(data.username) {
-                     var $department = $("<p style='font-size:25px'><span class='label label-info'>department:</span>&nbsp;&nbsp;<div style='margin-left:150px;margin-top:-43px;font-size:25px;font-weight:bold'>" + data.dep.join('<br>') + "</div></p>");
-                     var $userid = $("<p style='font-size:25px;font-weight:bold'><span class='label label-info'>user id:</span>&nbsp;&nbsp;" + data.userid + "</p>")
-                     var $name = $("<p style='font-size:25px;font-weight:bold'><span class='label label-info'>user name:</span>&nbsp;&nbsp;" + data.username + "</p>")
-                     $parent.append($userid).append($name).append($department);
-                 }else{
-                     var $userid = $("<p style='font-size:25px;font-weight:bold'><span class='label label-info'>user id:</span>&nbsp;&nbsp;" + data.userid + "</p>")
-                     var $info = $("<p style='font-size:25px;font-weight:bold'><span class='label label-info'>info:</span>&nbsp;&nbsp;Sorry,no information</p>")
-                     $parent.append($userid).append($info);
-                 }
-             })
 
-       });
+ $(function () {
+    $.ajaxSettings.async = false;
+             
+    $.getJSON('getpredictiondata?userid='+'{{userid}}', function(data) {
+        if(data.username) {
+            if(data.dep.length>0){
+                     data.dep[0] = {name:data.dep[0][0],y: data.dep[0][1],sliced: true,selected: true}
+                     $('#suggestion').highcharts({
+                            chart: {
+                                plotBackgroundColor: null,
+                                plotBorderWidth: null,
+                                plotShadow: false
+                            },
+                            credits: {
+                                 enabled: false
+                            },
+                            title: {
+                                text: '<span style="font-size:25px;">'+data.username+'&nbsp;&nbsp;&nbsp;&nbsp;id:'+data.userid+'</span>',
+                                useHTML:true
+                            },
+                            tooltip: {
+                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                            },
+                            plotOptions: {
+                                pie: {
+                                    allowPointSelect: true,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        color: '#000000',
+                                        connectorColor: '#000000',
+                                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                                    },
+                                    showInLegend: true
+                                }
+                            },
+                            series: [{
+                                type: 'pie',
+                                name: 'Browser share',
+                                data: data.dep
+                            }]
+                        });}else{
+                    
+                 $('#suggestion').html('<span style="font-size:25px;">'+data.username+'&nbsp;&nbsp;&nbsp;&nbsp;id:'+data.userid+'</span><br>'+'<span style="font-size:35px;color:#3399FF;">null</span>')       
+             }
+       }else{
+         $('#suggestion').html('<span style="font-size:35px;color:#3399FF;">sorry,no result</span>')
+        } 
+    });
+         
+});				
 </script>
 {% endblock %}
