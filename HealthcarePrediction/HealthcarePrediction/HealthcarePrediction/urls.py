@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'app.views.home', name='home'),
     url(r'^getpredictiondata', 'app.views.getpredictiondata', name='getpredictiondata'),
+    url(r'^getMedical', 'app.medical.getMedical', name='getMedical'),
     url(r'^contact$', 'app.views.contact', name='contact'),
     url(r'^about', 'app.views.about', name='about'),
     url(r'^login/$',
